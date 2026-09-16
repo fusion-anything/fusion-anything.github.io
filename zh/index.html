@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Fusion Anything 论文中文阅读版：面向任意模态组合与预测任务的广义多模态基础模型。">
+  <title>Fusion Anything · 中文阅读版</title>
+  <style>
+    :root {
+      --ink: #1f2b38;
+      --ink-2: #405064;
+      --dim: #7f8b98;
+      --line: #dfe5eb;
+      --paper: #fff;
+      --soft: #f6f8fa;
+      --red: #ef476f;
+      --orange: #f28e2b;
+      --teal: #00a890;
+      --violet: #934bed;
+      --blue: #184878;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--paper); }
+    body { margin: 0; overflow-x: hidden; color: var(--ink); background: var(--paper); font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    body, button, a { font-size: 18px; }
+    a { color: inherit; text-decoration: none; }
+    button { border: 0; cursor: pointer; font: inherit; }
+    ::selection { color: #fff; background: var(--blue); }
+    .site-header { position: fixed; z-index: 20; inset: 0 0 auto; height: 68px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 32px; border-bottom: 1px solid rgba(223,229,235,.92); background: rgba(255,255,255,.96); backdrop-filter: blur(8px); }
+    .brand { color: var(--blue); font-family: "Noto Serif SC", "Songti SC", serif; font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+    .brand em { color: var(--red); font-style: normal; }
+    .main-nav { display: flex; align-items: center; gap: 28px; color: var(--dim); font-size: 18px; }
+    .main-nav a { padding: 8px 0; border-bottom: 3px solid transparent; }
+    .main-nav a:hover, .main-nav a[aria-current="page"] { color: var(--ink); font-weight: 700; }
+    .main-nav a[aria-current="page"] { border-bottom-color: var(--red); }
+    .paper-link { justify-self: end; display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border: 1px solid #abc0d4; border-radius: 9px; color: var(--ink-2); }
+    .paper-link:hover, .paper-link:focus-visible { color: var(--blue); border-color: var(--blue); }
+    .color-rule { position: absolute; right: 0; bottom: -2px; left: 0; height: 3px; background: linear-gradient(90deg, var(--red) 0 20%, var(--orange) 20% 40%, var(--teal) 40% 60%, var(--violet) 60% 80%, var(--blue) 80%); opacity: .72; }
+    .page-nav { position: fixed; z-index: 19; top: 50%; right: 26px; display: flex; flex-direction: column; align-items: center; gap: 8px; transform: translateY(-50%); color: var(--dim); }
+    .page-nav button { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #b6c9da; border-radius: 50%; color: var(--ink-2); background: #fff; }
+    .page-nav button:hover:not(:disabled), .page-nav button:focus-visible { color: #fff; background: var(--blue); outline: none; }
+    .page-nav button:disabled { opacity: .3; cursor: not-allowed; }
+    .page-nav span { display: flex; flex-direction: column; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+    .page-nav strong { color: var(--red); font-size: 16px; }
+    .page-nav i { width: 1px; height: 20px; background: var(--line); }
+    .page-nav small { color: var(--blue); font-size: 16px; }
+    .slide { position: relative; min-height: 100svh; padding: 118px 0 74px; border-bottom: 1px solid var(--line); scroll-margin-top: 68px; scroll-snap-align: start; }
+    .slide::before { content: ""; position: absolute; top: 112px; left: 0; width: 5px; height: 100px; border-radius: 0 5px 5px 0; background: var(--accent, var(--blue)); }
+    .slide-inner { width: min(1160px, calc(100% - 170px)); min-height: calc(100svh - 192px); margin: 0 auto; }
+    .heading h2 { max-width: 900px; margin: 0; color: var(--ink); font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(3.5rem, 6vw, 5.7rem); font-weight: 400; letter-spacing: -.06em; line-height: 1.08; }
+    .heading h2 em { color: var(--accent, var(--blue)); font-style: normal; }
+    .subtitle { max-width: 800px; margin: 24px 0 0; color: var(--ink-2); font-size: 20px; line-height: 1.65; }
+    .eyebrow { color: var(--accent, var(--blue)); font-size: 16px; font-weight: 800; letter-spacing: .14em; line-height: 1.4; }
+    .figure { margin: 44px auto 0; }
+    .figure img { display: block; width: 100%; height: auto; border: 1px solid color-mix(in srgb, var(--accent, var(--blue)) 28%, var(--line)); border-top: 4px solid var(--accent, var(--blue)); border-radius: var(--radius) var(--radius) 0 0; background: #fff; box-shadow: 0 12px 28px rgba(63,86,110,.1); }
+    .figure-caption { margin: 12px 0 0; color: var(--ink-2); font-size: 16px; line-height: 1.55; text-align: center; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 76px; margin-top: 88px; }
+    .problem-list { margin-top: 16px; border-top: 1px solid var(--line); }
+    .problem-list p { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr); gap: 12px; align-items: center; margin: 0; padding: 19px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+    .problem-list b { color: var(--accent); text-align: center; }
+    .question { align-self: end; padding: 30px; border-left: 5px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; background: color-mix(in srgb, var(--accent) 7%, #fff); }
+    .question p { margin: 24px 0 0; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 32px; line-height: 1.38; }
+    .question strong { color: var(--accent); font-weight: 700; }
+    .three-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin: 24px auto 0; }
+    .three-notes p { margin: 0; color: var(--ink-2); font-size: 18px; line-height: 1.65; }
+    .three-notes b { color: var(--accent); }
+    .data-table-wrap { width: min(100%, 1100px); margin: 48px auto 0; overflow-x: auto; border-top: 4px solid var(--accent, var(--blue)); border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 8px 26px rgba(63,86,110,.08); }
+    .data-table-wrap:focus-visible { outline: 3px solid var(--accent, var(--blue)); outline-offset: 4px; }
+    table { width: 100%; border-collapse: collapse; color: var(--ink-2); font-size: 17px; line-height: 1.5; }
+    th, td { padding: 14px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    thead { background: color-mix(in srgb, var(--accent, var(--blue)) 7%, #fff); }
+    thead th { color: var(--accent, var(--blue)); font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+    tbody th { color: var(--ink); font-weight: 700; }
+    tbody tr:hover { background: color-mix(in srgb, var(--accent, var(--blue)) 4%, #fff); }
+    .best { color: var(--accent, var(--blue)); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .negative { color: var(--red); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .table-note { width: min(100%, 1100px); margin: 13px auto 0; color: var(--dim); font-size: 16px; line-height: 1.55; text-align: center; }
+    .context-chart { width: min(100%, 1060px); margin: 34px auto 0; padding: 25px 28px 20px; border-top: 4px solid var(--accent); background: #fff; box-shadow: 0 8px 28px rgba(31,43,56,.08); }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 12px 25px; margin-bottom: 17px; color: var(--ink-2); }
+    .chart-legend span { display: inline-flex; align-items: center; gap: 9px; }
+    .chart-legend i { width: 25px; height: 4px; border-radius: 99px; }
+    .chart-body, .chart-axis { display: grid; grid-template-columns: 30px 44px minmax(0, 900px); gap: 10px; justify-content: center; width: min(100%, 980px); margin-right: auto; margin-left: auto; }
+    .chart-body { align-items: stretch; }
+    .chart-y-label { align-self: center; color: var(--ink-2); font-family: "Noto Serif SC", "Songti SC", serif; transform: rotate(-90deg); white-space: nowrap; }
+    .chart-y-ticks { display: flex; flex-direction: column; justify-content: space-between; height: auto; min-height: 0; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .chart-plot, .chart-axis-content { min-width: 0; }
+    .chart-plot svg { display: block; width: 100%; height: auto; aspect-ratio: 760 / 190; overflow: visible; border: 1px solid var(--ink-2); }
+    .chart-gridline { stroke: #dfe5eb; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    .chart-x-ticks { display: grid; grid-template-columns: repeat(10, 1fr); margin-top: 8px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .chart-x-ticks span { text-align: center; }
+    .chart-x-label { margin-top: 6px; color: var(--ink-2); text-align: center; }
+    .chart-axis { margin-top: 8px; }
+    .context-chart figcaption { margin-top: 16px; color: var(--dim); font-size: 16px; line-height: 1.55; text-align: center; }
+    .context-chart figcaption a { color: var(--accent); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+    .callouts { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 48px 0 0; }
+    .callout { padding: 24px; border-top: 4px solid var(--teal); border-radius: var(--radius); background: color-mix(in srgb, var(--teal) 7%, #fff); }
+    .callout:nth-child(2) { border-top-color: var(--red); background: color-mix(in srgb, var(--red) 7%, #fff); }
+    .callout strong { display: block; color: var(--teal); font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(3.8rem, 7vw, 6.5rem); font-weight: 400; letter-spacing: -.06em; line-height: 1; }
+    .callout:nth-child(2) strong { color: var(--red); }
+    .callout span { display: block; margin-top: 12px; color: var(--dim); font-weight: 800; letter-spacing: .06em; }
+    .dataset-explorer { width: min(100%, 1080px); margin: 38px auto 0; }
+    .dataset-scope { color: var(--dim); font-size: 18px; }
+    .dataset-scope strong { color: var(--ink); font-family: "Noto Serif SC", "Songti SC", serif; font-size: 28px; }
+    .dataset-scope b { color: var(--accent); }
+    .domain-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .domain-tab { padding: 10px 15px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); background: #fff; }
+    .domain-tab:hover, .domain-tab:focus-visible { color: var(--accent); border-color: var(--accent); outline: none; }
+    .domain-tab[aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, #fff); font-weight: 800; }
+    .domain-tab span { margin-left: 7px; color: var(--dim); font-variant-numeric: tabular-nums; }
+    .domain-tab[aria-selected="true"] span { color: inherit; }
+    .domain-panel { margin-top: 18px; }
+    .domain-panel .data-table-wrap { margin: 0; }
+    .domain-panel table { min-width: 850px; }
+    .dataset-filter-note { margin: 12px 0 0; color: var(--dim); font-size: 16px; text-align: center; }
+    .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin: 50px auto 0; }
+    .summary-row > div { padding-top: 17px; border-top: 4px solid var(--accent); }
+    .summary-row strong { display: block; color: var(--accent); font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(3.5rem, 6vw, 5.7rem); font-weight: 400; line-height: 1; }
+    .summary-row span { display: block; margin-top: 12px; color: var(--dim); font-weight: 800; }
+    .encoder-table table { min-width: 1120px; table-layout: fixed; }
+    .encoder-table th, .encoder-table td { padding: 11px 9px; text-align: center; vertical-align: middle; }
+    .encoder-table .left { text-align: left; }
+    .encoder-table .group { background: color-mix(in srgb, var(--accent) 4%, #fff); }
+    .encoder-table .ours { border-left: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--accent) 5%, #fff); }
+    .encoder-table .ours.best { color: var(--accent); font-weight: 800; }
+    .encoder-table .ours.not-best { color: var(--ink-2); font-weight: 400; }
+    .encoder-note { width: min(100%, 1120px); margin: 13px auto 0; color: var(--dim); font-size: 16px; line-height: 1.55; text-align: center; }
+    .scroll-hint { display: none; margin: 10px 0 0; color: var(--dim); font-size: 16px; }
+    .flow { display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr; gap: 18px; align-items: center; margin: 100px auto 0; }
+    .flow-card { min-height: 160px; padding: 18px 0 0; border-top: 4px solid var(--red); }
+    .flow-card:nth-of-type(3) { border-top-color: var(--teal); }
+    .flow-card:nth-of-type(5) { border-top-color: var(--violet); }
+    .flow-card strong { display: block; margin-top: 24px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 31px; font-weight: 400; line-height: 1.25; }
+    .flow-arrow { color: var(--orange); font-family: "Noto Serif SC", "Songti SC", serif; font-size: 36px; text-align: center; }
+    .closing-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 58px; align-items: start; margin-top: 55px; }
+    .authors { padding-top: 19px; border-top: 4px solid var(--red); color: var(--ink-2); line-height: 1.75; }
+    .authors p { margin: 0 0 16px; }
+    .authors sup { color: var(--red); font-size: .72em; font-weight: 800; }
+    .legend { color: var(--dim); font-size: 16px; line-height: 1.7; }
+    .read-paper { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 11px 15px; border: 1px solid var(--red); border-radius: 8px; color: var(--red); font-weight: 800; }
+    .read-paper:hover, .read-paper:focus-visible { color: #fff; background: var(--red); outline: none; }
+    .bibtex { padding-top: 19px; border-top: 4px solid var(--violet); }
+    .bibtex-head { display: flex; justify-content: space-between; align-items: center; color: var(--violet); font-weight: 800; }
+    .copy-button { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border: 1px solid var(--violet); border-radius: 8px; color: var(--violet); background: #fff; }
+    .copy-button:hover, .copy-button:focus-visible { color: #fff; background: var(--violet); outline: none; }
+    pre { overflow-x: auto; margin: 17px 0 0; padding: 17px; border: 1px solid var(--line); color: var(--ink-2); background: var(--soft); font: 16px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+    .slide--hero { --accent: var(--blue); }
+    .slide--problem { --accent: var(--red); }
+    .slide--method { --accent: var(--orange); }
+    .slide--architecture { --accent: var(--teal); }
+    .slide--attention { --accent: #3f7fb3; }
+    .slide--in-context { --accent: var(--violet); }
+    .slide--experiments { --accent: var(--teal); }
+    .slide--experiments .data-table-wrap { margin-top: 0; }
+    .slide--experiments th, .slide--experiments td { padding: 9px 12px; }
+    .slide--experiments th:not(:first-child), .slide--experiments td { text-align: center; }
+    .slide--benchmark { --accent: var(--orange); }
+    .slide--context { --accent: var(--orange); }
+    .slide--datasets { --accent: var(--teal); }
+    .slide--ablation { --accent: var(--violet); }
+    .slide--ablation .negative { display: none; }
+    .slide--encoder { --accent: var(--teal); }
+    .slide--conclusion { --accent: var(--blue); }
+    .slide--applications { --accent: var(--violet); }
+    .slide--closing { --accent: var(--red); }
+    .hero-layout { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 48px; align-items: center; min-height: calc(100svh - 190px); }
+    .hero-title { margin: 28px 0 0; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(5rem, 10vw, 10.5rem); font-weight: 400; letter-spacing: -.1em; line-height: .86; }
+    .hero-title span { display: block; }
+    .hero-title span:first-child { color: var(--red); }
+    .hero-title span:last-child { color: var(--orange); }
+    .hero-subtitle { max-width: 510px; margin: 30px 0 0; color: var(--ink-2); font-size: 23px; line-height: 1.65; }
+    .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 32px; padding: 15px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .hero-stats b { display: block; margin-bottom: 4px; color: var(--teal); font-family: "Noto Serif SC", "Songti SC", serif; font-size: 30px; }
+    .hero-stats div:nth-child(2) b { color: var(--orange); }
+    .hero-stats div:nth-child(3) b { color: var(--violet); }
+    .hero-stats div:nth-child(4) b { color: var(--red); }
+    .hero-stats span { color: var(--dim); font-size: 16px; font-weight: 800; line-height: 1.35; }
+    .hero-authors { margin-top: 24px; color: var(--ink-2); font-size: 17px; line-height: 1.75; }
+    .hero-authors sup { color: var(--red); font-size: .7em; font-weight: 800; }
+    .hero-affiliations { margin-top: 9px; color: var(--dim); font-size: 16px; line-height: 1.55; }
+    .hero-figure { width: 100%; }
+    .hero-figure img { border: 0; box-shadow: none; }
+    .hero-figure .figure-caption { display: none; }
+    .blank-page .slide-inner { display: grid; place-items: center; }
+    .blank-page .heading { text-align: center; }
+    .blank-page .heading h2 { max-width: none; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media (max-width: 1050px) {
+      .site-header { padding: 0 22px; }
+      .main-nav { gap: 17px; }
+      .page-nav { right: 12px; }
+      .slide-inner { width: min(100% - 115px, 900px); }
+      .hero-layout { gap: 28px; }
+      .split { gap: 45px; }
+    }
+    @media (max-width: 760px) {
+      html { scroll-snap-type: none; }
+      .site-header { height: 58px; grid-template-columns: 1fr auto; padding: 0 16px; }
+      .brand { font-size: 20px; }
+      .main-nav { display: none; }
+      .paper-link { padding: 7px 10px; font-size: 16px; }
+      .page-nav { top: auto; right: 13px; bottom: 14px; flex-direction: row; gap: 6px; padding: 4px 7px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.95); transform: none; }
+      .page-nav button { width: 30px; height: 30px; }
+      .page-nav span { flex-direction: row; gap: 5px; }
+      .page-nav i { width: 17px; height: 1px; }
+      .page-nav small { display: none; }
+      .slide { min-height: 100svh; padding: 86px 0 48px; scroll-margin-top: 58px; }
+      .slide::before { top: 80px; height: 74px; }
+      .slide-inner { width: calc(100% - 42px); min-height: calc(100svh - 134px); }
+      .heading h2 { font-size: clamp(3rem, 14vw, 4.5rem); line-height: 1.05; }
+      .subtitle { margin-top: 17px; font-size: 18px; line-height: 1.6; }
+      .figure { margin-top: 30px; }
+      .figure-caption, .three-notes p, .table-note, .encoder-note, .context-chart figcaption, .dataset-filter-note, .scroll-hint, pre { font-size: 16px; }
+      .split, .hero-layout, .closing-layout { display: block; margin-top: 44px; }
+      .question { margin-top: 38px; }
+      .question p { font-size: 25px; }
+      .three-notes { grid-template-columns: 1fr; gap: 14px; }
+      .data-table-wrap { margin-top: 32px; }
+      table { min-width: 720px; font-size: 16px; }
+      th, td { padding: 12px 10px; }
+      .callouts, .summary-row { grid-template-columns: 1fr; gap: 18px; margin-top: 34px; }
+      .callout strong, .summary-row strong { font-size: 4.2rem; }
+      .context-chart { width: 100%; margin-top: 27px; padding: 17px 10px 16px; }
+      .chart-body, .chart-axis { grid-template-columns: 23px 36px minmax(0, 1fr); gap: 6px; width: 100%; }
+      .chart-y-ticks { min-height: 0; }
+      .chart-x-ticks span:nth-child(even) { visibility: hidden; }
+      .domain-tabs { gap: 8px; }
+      .domain-tab { padding: 9px 11px; font-size: 16px; }
+      .domain-panel table { min-width: 850px; }
+      .scroll-hint { display: block; }
+      .flow { grid-template-columns: 1fr; gap: 0; margin-top: 50px; }
+      .flow-card { min-height: 105px; }
+      .flow-card strong { margin-top: 14px; font-size: 26px; }
+      .flow-arrow { padding: 8px 0; transform: rotate(90deg); }
+      .authors { margin-top: 0; }
+      .bibtex { margin-top: 36px; }
+      .hero-layout { min-height: auto; }
+      .hero-title { font-size: clamp(5rem, 22vw, 7.2rem); }
+      .hero-subtitle { margin-top: 23px; font-size: 20px; }
+      .hero-stats { gap: 7px; }
+      .hero-stats b { font-size: 24px; }
+      .hero-stats span, .hero-authors, .hero-affiliations { font-size: 16px; }
+      .hero-figure { margin-top: 31px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#motivation">Fusion <em>Anything</em></a>
+    <nav class="main-nav" aria-label="主导航">
+      <a data-nav="motivation" href="#motivation">动机</a>
+      <a data-nav="method" href="#method">方法</a>
+      <a data-nav="experiments" href="#experiments">实验</a>
+      <a data-nav="conclusion" href="#conclusion">结论</a>
+      <a data-nav="applications" href="#applications">应用</a>
+    </nav>
+    <a class="paper-link" href="https://www.researchgate.net/publication/413785302_Fusion_Anything_A_Generalized_Multimodal_Foundation_Model" target="_blank" rel="noreferrer">论文 ↗</a>
+    <div class="color-rule" aria-hidden="true"></div>
+  </header>
+
+  <aside class="page-nav" aria-label="页面翻页">
+    <button id="previous" type="button" aria-label="上一页">↑</button>
+    <span><strong id="current-page">01</strong><i></i><span id="total-pages">14</span></span>
+    <button id="next" type="button" aria-label="下一页">↓</button>
+    <small>↑ ↓</small>
+  </aside>
+
+  <main>
+    <section id="motivation" class="slide slide--hero" data-index="0">
+      <div class="slide-inner hero-layout">
+        <div>
+          <h1 class="hero-title"><span>Fusion</span><span>Anything</span></h1>
+          <p class="hero-subtitle">学习可迁移的多模态关联，面向任意模态组合与预测任务。</p>
+          <div class="hero-stats" aria-label="论文评估范围">
+            <div><b>100+</b><span>数据集</span></div>
+            <div><b>12</b><span>模态</span></div>
+            <div><b>11</b><span>领域</span></div>
+            <div><b>0</b><span>任务专属更新</span></div>
+          </div>
+          <div class="hero-authors">Huizi Cui<sup>1†</sup> · Zongbo Han<sup>2†‡</sup> · Chenggong Ding<sup>1</sup> · Naichuan Xiao<sup>1</sup> · Jialong Yang<sup>1</sup> · Jingdong Chen<sup>1</sup> · Yafei Yang<sup>1</sup> · Guangyu Wang<sup>2</sup> · Qinghua Hu<sup>1</sup> · Changqing Zhang<sup>1*</sup></div>
+          <div class="hero-affiliations"><b>1</b> Tianjin University<br><b>2</b> Beijing University of Posts and Telecommunications<br><span>† 共同贡献　‡ 项目负责人　* 通讯作者</span><br>预印本 · 2026</div>
+        </div>
+        <figure class="figure hero-figure"><img src="../figure-1.png" alt="Fusion Anything 将多种模态连接到预测任务的统一模型示意图"><figcaption class="figure-caption">统一的多模态基础模型示意图</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="problem" class="slide slide--problem" data-index="1">
+      <div class="slide-inner">
+        <div class="heading"><h2>从固定融合<br><em>到开放场景。</em></h2><p class="subtitle">多数多模态模型围绕预先定义的模态集合和单一预测目标进行训练。</p></div>
+        <div class="split">
+          <div><div class="eyebrow">现有范式</div><div class="problem-list"><p>图像 + 文本 <b>→</b> 模型 A</p><p>音频 + 视频 <b>→</b> 模型 B</p><p>临床图像 + 患者元数据 <b>→</b> 模型 C</p><p><span>新模态</span> <b>→</b> 重新训练</p></div></div>
+          <div class="question"><div class="eyebrow">核心问题</div><p>一个模型能否适应<strong>任意模态组合</strong>和<strong>任意预测任务</strong>？</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" class="slide slide--method" data-index="2">
+      <div class="slide-inner">
+        <div class="heading"><h2>为缺失世界生成<br><em>合成数据。</em></h2><p class="subtitle">当真实世界的多模态数据稀缺时，Structural Multimodal Causal Models 能生成多样的关联模式。</p></div>
+        <figure class="figure"><img src="../figure-2.png" alt="Structural Multimodal Causal Models 的合成多模态数据生成过程与 SMCM 因果图"></figure>
+        <div class="three-notes"><p><b>根表示</b><br>共享的潜在状态提供底层信息。</p><p><b>共享节点</b><br>选定的信息可以穿过多个模态节点。</p><p><b>私有节点</b><br>模态特有的变化保留在局部。</p></div>
+      </div>
+    </section>
+
+    <section id="architecture" class="slide slide--architecture" data-index="3">
+      <div class="slide-inner">
+        <div class="heading"><h2>一个模型，许多<br><em>预测任务。</em></h2><p class="subtitle">Fusion Anything 将基于上下文的预测从结构化数据扩展到异构多模态场景。</p></div>
+        <figure class="figure"><img src="../figure-3.png" alt="Fusion Anything 的统一 token 生成、关联模式激活与预测流程"></figure>
+        <div class="three-notes"><p><b>编码</b><br>读取可用模态。</p><p><b>映射</b><br>将它们映射到统一 token 空间。</p><p><b>推理</b><br>从带标签的上下文样本中推断。</p></div>
+      </div>
+    </section>
+
+    <section id="attention" class="slide slide--attention" data-index="4">
+      <div class="slide-inner">
+        <div class="heading"><h2>保留证据的<br><em>结构。</em></h2><p class="subtitle">Hierarchical multimodal attention 在三个层级上建模关系，而不是把所有 token 当作无序序列。</p></div>
+        <div class="data-table-wrap" data-scrollable="true" tabindex="0"><table aria-label="Hierarchical multimodal attention 的三个层级"><thead><tr><th>层级</th><th>建模对象</th><th>意义</th></tr></thead><tbody><tr><th>模态级 attention</th><td>单一模态内部 token 之间的依赖</td><td>保留模态特有的表示</td></tr><tr><th>跨模态 attention</th><td>同一样本内不同模态之间的交互</td><td>捕捉互补信息与共享信息</td></tr><tr><th>样本级 attention</th><td>上下文样本之间的信息</td><td>推断任务相关的关联模式</td></tr></tbody></table></div>
+        <div class="table-note"><b>层级：</b>token → 模态 → 样本 → 任务</div>
+      </div>
+    </section>
+
+    <section id="in-context" class="slide slide--in-context" data-index="5">
+      <div class="slide-inner">
+        <div class="heading"><h2>任务就在<br><em>上下文中。</em></h2><p class="subtitle">在推理时，带标签的示例识别应当使用的关联；模型参数保持不变。</p></div>
+        <div class="flow" style="margin-top: 96px;">
+          <div class="flow-card" style="border-top-color:var(--violet)"><span class="eyebrow">上下文集 · 带标签</span><strong>x₁ → y₁<br>x₂ → y₂<br>x₃ → y₃<br>x₄ → y₄</strong></div><div class="flow-arrow">→</div>
+          <div class="flow-card" style="border-top-color:var(--teal); text-align:center"><span class="eyebrow">激活相关</span><strong>Fusion<br>Anything</strong><p>关联模式</p></div><div class="flow-arrow">→</div>
+          <div class="flow-card" style="border-top-color:var(--orange)"><span class="eyebrow">查询 · 未见样本</span><strong>x<sub>q</sub> → ?</strong><p>预测</p></div>
+        </div>
+        <div class="table-note" style="margin-top:46px"><b>不更新参数</b>　·　对未见多模态设置直接预测</div>
+      </div>
+    </section>
+
+    <section id="experiments" class="slide slide--experiments" data-index="6">
+      <div class="slide-inner">
+        <div class="heading"><h2>与专用模型<br><em>竞争。</em></h2></div>
+        <div class="data-table-wrap" data-scrollable="true" tabindex="0"><table aria-label="12 组数据集准确率对比"><thead><tr><th>数据集</th><th>Fusion Anything ACC (%)</th><th>专用方法均值 ACC (%)</th><th>差值（百分点）</th></tr></thead><tbody>
+          <tr><th>GAMMA</th><td class="best">70.00</td><td>62.33</td><td class="best">+7.67</td></tr>
+          <tr><th>NYUDv2</th><td class="best">59.33</td><td>49.57</td><td class="best">+9.76</td></tr>
+          <tr><th>MultiOFF</th><td class="best">63.76</td><td>59.28</td><td class="best">+4.48</td></tr>
+          <tr><th>MET-Meme(E)</th><td class="best">38.39</td><td>33.08</td><td class="best">+5.31</td></tr>
+          <tr><th>Handwritten</th><td class="best">98.75</td><td>83.48</td><td class="best">+15.27</td></tr>
+          <tr><th>WESAD</th><td class="best">83.35</td><td>63.19</td><td class="best">+20.16</td></tr>
+          <tr><th>MELD</th><td class="best">64.29</td><td>57.66</td><td class="best">+6.63</td></tr>
+          <tr><th>MUStARD</th><td>70.29</td><td>70.97</td><td class="negative">−0.68</td></tr>
+          <tr><th>TCGA-KIRC</th><td class="best">72.73</td><td>68.08</td><td class="best">+4.65</td></tr>
+          <tr><th>TCGA-LUAD</th><td class="best">60.66</td><td>55.96</td><td class="best">+4.70</td></tr>
+          <tr><th>PAD-UFES-20</th><td class="best">76.85</td><td>72.55</td><td class="best">+4.30</td></tr>
+          <tr><th>N-MNIST+N-TIDIGITS</th><td class="best">94.28</td><td>87.18</td><td class="best">+7.10</td></tr>
+        </tbody></table></div>
+      </div>
+    </section>
+
+    <section id="benchmark" class="slide slide--benchmark" data-index="7">
+      <div class="slide-inner">
+        <div class="heading"><h2>在不同数据世界中<br><em>保持稳定。</em></h2><p class="subtitle">当模态、领域和预测任务发生变化时，Fusion Anything 仍然接近排名顶部。</p></div>
+        <div class="summary-row"><div><strong>11</strong><span>个第一名</span></div><div><strong>15 / 18</strong><span>次进入前二</span></div></div>
+        <figure class="figure"><img src="../figure-4.png" alt="论文第 4 图：18 个多模态数据集上六种方法的完整排名矩阵"><figcaption class="figure-caption">18 个数据集上的性能排名；颜色更深表示排名更高。</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="ablation" class="slide slide--ablation" data-index="8">
+      <div class="slide-inner">
+        <div class="heading"><h2>超越表格数据<br><em>基础模型。</em></h2><p class="subtitle">Fusion Anything 在这八个数据集上的 ACC 均有所提升；相较 TabPFN，AUC 表现不一。</p></div>
+        <div id="ablation-table" class="data-table-wrap" data-scrollable="true" tabindex="0"></div>
+      </div>
+    </section>
+
+    <section id="context-scaling" class="slide slide--context" data-index="9">
+      <div class="slide-inner">
+        <div class="heading"><h2>更多上下文，<br><em>通常带来更强预测。</em></h2><p class="subtitle">在五个数据集上，准确率总体随上下文增加而提升，但存在局部波动，收益也会逐渐趋缓。</p></div>
+        <figure id="context-chart" class="context-chart"></figure>
+      </div>
+    </section>
+
+    <section id="encoder-flexibility" class="slide slide--encoder" data-index="10">
+      <div class="slide-inner">
+        <div class="heading"><h2>更换编码器，<br><em>保持优势。</em></h2></div>
+        <div id="encoder-table" class="data-table-wrap encoder-table" data-scrollable="true" tabindex="0"></div>
+        <p class="scroll-hint">窄屏下可左右滑动以查看全部编码器列。</p>
+      </div>
+    </section>
+
+    <section id="conclusion" class="slide slide--conclusion" data-index="11">
+      <div class="slide-inner">
+        <div class="heading"><h2>从固定模态<br><em>到可迁移关联。</em></h2><p class="subtitle">Fusion Anything 从合成因果世界中学习广泛的多模态关系，再通过上下文示例激活相关关联。</p></div>
+        <div class="flow"><div class="flow-card"><span class="eyebrow">预训练</span><strong>许多合成的<br>关联模式</strong></div><div class="flow-arrow">→</div><div class="flow-card"><span class="eyebrow">推理</span><strong>上下文决定<br>相关关联</strong></div><div class="flow-arrow">→</div><div class="flow-card"><span class="eyebrow">预测</span><strong>在已评估的<br>多模态设置中</strong></div></div>
+      </div>
+    </section>
+
+    <section id="applications" class="slide slide--applications blank-page" data-index="12">
+      <div class="slide-inner"><div class="heading"><h2>应用</h2></div></div>
+    </section>
+
+    <section id="closing" class="slide slide--closing" data-index="13">
+      <div class="slide-inner">
+        <div class="heading"><h2>Fusion<br><em>Anything。</em></h2><p class="subtitle">面向超越预定义模态组合的预测任务的广义多模态基础模型。</p></div>
+        <div class="closing-layout">
+          <div class="authors"><p>Huizi Cui<sup>1†</sup> · Zongbo Han<sup>2†‡</sup> · Chenggong Ding<sup>1</sup> · Naichuan Xiao<sup>1</sup> · Jialong Yang<sup>1</sup> · Jingdong Chen<sup>1</sup> · Yafei Yang<sup>1</sup> · Guangyu Wang<sup>2</sup> · Qinghua Hu<sup>1</sup> · Changqing Zhang<sup>1*</sup></p><p class="legend"><b>1</b> Tianjin University<br><b>2</b> Beijing University of Posts and Telecommunications<br>† 共同贡献　‡ 项目负责人　* 通讯作者</p><a class="read-paper" href="https://www.researchgate.net/publication/413785302_Fusion_Anything_A_Generalized_Multimodal_Foundation_Model" target="_blank" rel="noreferrer">阅读论文 ↗</a></div>
+          <div class="bibtex"><div class="bibtex-head"><span>引用 · .bib</span><button id="copy-bib" class="copy-button" type="button">复制 .bib</button></div><pre id="bib-content">@article{cui2026fusionanything,
+  title   = {Fusion Anything: A Generalized Multimodal Foundation Model},
+  author  = {Cui, Huizi and Han, Zongbo and Ding, Chenggong and Xiao, Naichuan and Yang, Jialong and Chen, Jingdong and Yang, Yafei and Wang, Guangyu and Hu, Qinghua and Zhang, Changqing},
+  year    = {2026},
+  note    = {Preprint}
+}</pre></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const sections = $$('.slide');
+      const currentPage = $('#current-page');
+      const previous = $('#previous');
+      const next = $('#next');
+      let activeIndex = 0;
+
+      const setActive = (index, updateHash = false) => {
+        activeIndex = Math.max(0, Math.min(sections.length - 1, index));
+        currentPage.textContent = String(activeIndex + 1).padStart(2, '0');
+        previous.disabled = activeIndex === 0;
+        next.disabled = activeIndex === sections.length - 1;
+        $$('[data-nav]').forEach((link) => {
+          const isCurrent = link.dataset.nav === (activeIndex <= 1 ? 'motivation' : activeIndex <= 5 ? 'method' : activeIndex <= 10 ? 'experiments' : activeIndex === 11 ? 'conclusion' : activeIndex === 12 ? 'applications' : '');
+          if (isCurrent) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+        });
+        if (updateHash) history.replaceState(null, '', '#' + sections[activeIndex].id);
+      };
+      const goTo = (index) => sections[index]?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      previous.addEventListener('click', () => goTo(activeIndex - 1));
+      next.addEventListener('click', () => goTo(activeIndex + 1));
+      const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) setActive(Number(entry.target.dataset.index)); }), { threshold: .55 });
+      sections.forEach((section) => observer.observe(section));
+      const hashIndex = sections.findIndex((section) => section.id === location.hash.slice(1));
+      if (hashIndex >= 0) setActive(hashIndex);
+      window.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown' && event.key !== 'Home' && event.key !== 'End') return;
+        const target = event.target;
+        if (target instanceof HTMLElement && (target.closest('button, a, input, textarea, select, [contenteditable="true"], [role="tab"], [data-scrollable="true"]'))) return;
+        event.preventDefault();
+        if (event.key === 'ArrowUp') goTo(activeIndex - 1);
+        if (event.key === 'ArrowDown') goTo(activeIndex + 1);
+        if (event.key === 'Home') goTo(0);
+        if (event.key === 'End') goTo(sections.length - 1);
+      });
+
+      const chartSeries = [
+        { name: 'MVSA-Single', color: '#735080', values: [.68,.74,.74,.73,.72,.72,.75,.74,.76,.77] },
+        { name: 'Derm7pt', color: '#ba2026', values: [.61,.65,.67,.70,.71,.69,.72,.72,.73,.72] },
+        { name: 'NYUDv2', color: '#215f88', values: [.49,.54,.54,.57,.54,.57,.56,.57,.57,.59] },
+        { name: 'N-MNIST+N-TIDIGITS', color: '#2d7045', values: [.88,.90,.91,.92,.93,.93,.94,.94,.95,.94] },
+        { name: 'WESAD', color: '#c86513', values: [.75,.76,.75,.76,.77,.79,.79,.78,.82,.84] }
+      ];
+      const fractions = [10,20,30,40,50,60,70,80,90,100];
+      const chartWidth = 760;
+      const chartHeight = 190;
+      const x = (index) => (index / (fractions.length - 1)) * chartWidth;
+      const y = (value) => chartHeight - ((value - .4) / .6) * chartHeight;
+      const chart = $('#context-chart');
+      const grid = [...Array(7)].map((_, index) => `<line x1="0" x2="${chartWidth}" y1="${index / 6 * chartHeight}" y2="${index / 6 * chartHeight}" class="chart-gridline" />`).join('');
+      const vertical = fractions.map((_, index) => `<line x1="${x(index)}" x2="${x(index)}" y1="0" y2="${chartHeight}" class="chart-gridline" />`).join('');
+      const lines = chartSeries.map((series) => `<g><polyline points="${series.values.map((value, index) => `${x(index)},${y(value)}`).join(' ')}" fill="none" stroke="${series.color}" stroke-width="4" vector-effect="non-scaling-stroke" />${series.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="6" fill="#fff" stroke="${series.color}" stroke-width="3" vector-effect="non-scaling-stroke" />`).join('')}</g>`).join('');
+      chart.innerHTML = `<div class="chart-legend">${chartSeries.map((series) => `<span><i style="background:${series.color}"></i>${series.name}</span>`).join('')}</div><div class="chart-body"><div class="chart-y-label">准确率</div><div class="chart-y-ticks">${[1,.9,.8,.7,.6,.5,.4].map((tick) => `<span>${tick.toFixed(1)}</span>`).join('')}</div><div class="chart-plot"><svg viewBox="0 0 ${chartWidth} ${chartHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="五个数据集上，随着上下文比例增加而变化的准确率曲线">${grid}${vertical}${lines}</svg></div></div><div class="chart-axis"><span aria-hidden="true"></span><span aria-hidden="true"></span><div class="chart-axis-content"><div class="chart-x-ticks">${fractions.map((fraction) => `<span>${fraction}</span>`).join('')}</div><div class="chart-x-label">上下文比例 (%)</div></div></div><figcaption>曲线根据论文第 6 图目测近似重建；未展示原图中的波动带。<a href="../figure-6.png" target="_blank" rel="noreferrer">查看论文原图</a></figcaption>`;
+
+      const ablationRows = [['GAMMA',65,80.67,70,83.33],['TCGA-KIRC',69.70,69.83,72.73,71.49],['Enrico',49.66,80.75,50.68,83.51],['MET-Meme(E)',35.55,64.16,38.39,66.02],['RAVDESS',55.21,88.25,60,92.51],['WESAD',79.34,90.90,83.35,93.35],['TCGA-LUAD',54.10,58.11,60.66,45.16],['PAD-UFES-20',76.29,93.16,76.85,93.04]];
+      $('#ablation-table').innerHTML = `<table aria-label="TabPFN 与 Fusion Anything 的消融结果"><thead><tr><th rowspan="2">数据集</th><th colspan="2">TabPFN</th><th colspan="2">Fusion Anything</th></tr><tr><th>ACC ↑</th><th>AUC ↑</th><th>ACC ↑</th><th>AUC ↑</th></tr></thead><tbody>${ablationRows.map((row) => { const aucDelta = row[4] - row[2]; return `<tr><th>${row[0]}</th><td>${row[1].toFixed(2)}</td><td>${row[2].toFixed(2)}</td><td class="best">${row[3].toFixed(2)}</td><td class="${aucDelta >= 0 ? 'best' : ''}">${row[4].toFixed(2)}${aucDelta < 0 ? `<span class="negative">　−${Math.abs(aucDelta).toFixed(2)}</span>` : ''}</td></tr>`; }).join('')}</tbody></table>`;
+
+      const encoderRows = [
+        ['Derm7pt','图像 + 表格','ResNet18 + TabPFN',61.10,53.92,62.87,63.80,56.29,59.60,72.41], ['Derm7pt','图像 + 表格','DINOv3 + TabPFN',66.50,54.43,58.73,64.56,60.42,60.93,74.68], ['MultiOFF','图像 + 文本','DINOv3 + Qwen3',56.82,59.06,60.18,58.17,62.19,59.28,63.76], ['MultiOFF','图像 + 文本','ResNet18 + Qwen3',56.38,61.74,64.21,56.15,62.64,60.22,63.76], ['MultiOFF','图像 + 文本','DINOv3 + SigLIP2',55.03,58.39,61.07,58.61,54.59,57.54,61.74], ['NYUDv2','RGB + 深度','ResNet18 + ResNet18',56.17,40.06,45.06,53.41,53.16,49.57,59.33], ['NYUDv2','RGB + 深度','DINOv3 + ResNet18',73.04,41.79,64.93,70.74,71.61,64.42,75.54], ['NYUDv2','RGB + 深度','ResNet18 + DINOv3',60.60,31.09,52.04,58.51,58.10,52.07,62.23], ['RAVDESS','音频 + 视觉','WavLM + DINOv3',55,23.54,63.75,57.64,51.74,50.33,60], ['RAVDESS','音频 + 视觉','Whisper + DINOv3',76.53,35.42,66.04,67.22,67.71,62.58,74.17], ['RAVDESS','音频 + 视觉','WavLM + ResNet18',31.04,19.17,51.39,35,32.99,33.92,48.54]
+      ];
+      const header = ['数据集','模态','编码器组合','Concat','EFT','MTO','CAF','TMC','均值','本文方法'];
+      const encoderBody = encoderRows.map((row, index) => { const first = index === 0 || encoderRows[index - 1][0] !== row[0]; const count = encoderRows.filter((candidate) => candidate[0] === row[0]).length; const bestBaseline = Math.max(...row.slice(3,8)); const oursBest = row[9] >= bestBaseline; return `<tr>${first ? `<th rowspan="${count}" class="group">${row[0]}</th><td rowspan="${count}" class="group">${row[1]}</td>` : ''}<td class="left">${row[2]}</td>${row.slice(3,8).map((value) => `<td>${value.toFixed(2)}</td>`).join('')}<td>${row[8].toFixed(2)}</td><td class="ours ${oursBest ? 'best' : 'not-best'}" aria-label="${row[9].toFixed(2)}，${oursBest ? '本行最佳' : '低于某个单独基线'}">${row[9].toFixed(2)}</td></tr>`; }).join('');
+      $('#encoder-table').innerHTML = `<table aria-label="不同预训练编码器配置下的比较"><colgroup><col style="width:10%"><col style="width:13%"><col style="width:20%"><col span="5" style="width:7.5%"><col style="width:9%"><col style="width:10.5%"></colgroup><thead><tr>${header.map((item, index) => `<th class="${index === 2 ? 'left' : ''}">${item}</th>`).join('')}</tr></thead><tbody>${encoderBody}</tbody></table>`;
+
+      $('#copy-bib').addEventListener('click', async () => {
+        const button = $('#copy-bib');
+        try { await navigator.clipboard.writeText($('#bib-content').textContent); button.textContent = '已复制'; setTimeout(() => { button.textContent = '复制 .bib'; }, 1600); } catch { button.textContent = '请手动复制'; }
+      });
+    })();
+  </script>
+</body>
+</html>
