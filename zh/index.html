@@ -263,7 +263,7 @@
 
   <aside class="page-nav" aria-label="页面翻页">
     <button id="previous" type="button" aria-label="上一页">↑</button>
-    <span><strong id="current-page">01</strong><i></i><span id="total-pages">14</span></span>
+    <span><strong id="current-page">01</strong><i></i><span id="total-pages">13</span></span>
     <button id="next" type="button" aria-label="下一页">↓</button>
     <small>↑ ↓</small>
   </aside>
@@ -361,21 +361,14 @@
       </div>
     </section>
 
-    <section id="ablation" class="slide slide--ablation" data-index="8">
-      <div class="slide-inner">
-        <div class="heading"><h2>超越表格数据<br><em>基础模型。</em></h2><p class="subtitle">Fusion Anything 在这八个数据集上的 ACC 均有所提升；相较 TabPFN，AUC 表现不一。</p></div>
-        <div id="ablation-table" class="data-table-wrap" data-scrollable="true" tabindex="0"></div>
-      </div>
-    </section>
-
-    <section id="context-scaling" class="slide slide--context" data-index="9">
+    <section id="context-scaling" class="slide slide--context" data-index="8">
       <div class="slide-inner">
         <div class="heading"><h2>更多上下文，<br><em>通常带来更强预测。</em></h2><p class="subtitle">在五个数据集上，准确率总体随上下文增加而提升，但存在局部波动，收益也会逐渐趋缓。</p></div>
         <figure id="context-chart" class="context-chart"></figure>
       </div>
     </section>
 
-    <section id="encoder-flexibility" class="slide slide--encoder" data-index="10">
+    <section id="encoder-flexibility" class="slide slide--encoder" data-index="9">
       <div class="slide-inner">
         <div class="heading"><h2>更换编码器，<br><em>保持优势。</em></h2></div>
         <div id="encoder-table" class="data-table-wrap encoder-table" data-scrollable="true" tabindex="0"></div>
@@ -383,18 +376,18 @@
       </div>
     </section>
 
-    <section id="conclusion" class="slide slide--conclusion" data-index="11">
+    <section id="conclusion" class="slide slide--conclusion" data-index="10">
       <div class="slide-inner">
         <div class="heading"><h2>从固定模态<br><em>到可迁移关联。</em></h2><p class="subtitle">Fusion Anything 从合成因果世界中学习广泛的多模态关系，再通过上下文示例激活相关关联。</p></div>
         <div class="flow"><div class="flow-card"><span class="eyebrow">预训练</span><strong>许多合成的<br>关联模式</strong></div><div class="flow-arrow">→</div><div class="flow-card"><span class="eyebrow">推理</span><strong>上下文决定<br>相关关联</strong></div><div class="flow-arrow">→</div><div class="flow-card"><span class="eyebrow">预测</span><strong>在已评估的<br>多模态设置中</strong></div></div>
       </div>
     </section>
 
-    <section id="applications" class="slide slide--applications blank-page" data-index="12">
+    <section id="applications" class="slide slide--applications blank-page" data-index="11">
       <div class="slide-inner"><div class="heading"><h2>应用</h2></div></div>
     </section>
 
-    <section id="closing" class="slide slide--closing" data-index="13">
+    <section id="closing" class="slide slide--closing" data-index="12">
       <div class="slide-inner">
         <div class="heading"><h2>Fusion<br><em>Anything。</em></h2><p class="subtitle">面向超越预定义模态组合的预测任务的广义多模态基础模型。</p></div>
         <div class="closing-layout">
@@ -426,7 +419,7 @@
         previous.disabled = activeIndex === 0;
         next.disabled = activeIndex === sections.length - 1;
         $$('[data-nav]').forEach((link) => {
-          const isCurrent = link.dataset.nav === (activeIndex <= 1 ? 'motivation' : activeIndex <= 5 ? 'method' : activeIndex <= 10 ? 'experiments' : activeIndex === 11 ? 'conclusion' : activeIndex === 12 ? 'applications' : '');
+          const isCurrent = link.dataset.nav === (activeIndex <= 1 ? 'motivation' : activeIndex <= 5 ? 'method' : activeIndex <= 9 ? 'experiments' : activeIndex === 10 ? 'conclusion' : activeIndex === 11 ? 'applications' : '');
           if (isCurrent) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
         });
         if (updateHash) history.replaceState(null, '', '#' + sections[activeIndex].id);
@@ -466,9 +459,6 @@
       const vertical = fractions.map((_, index) => `<line x1="${x(index)}" x2="${x(index)}" y1="0" y2="${chartHeight}" class="chart-gridline" />`).join('');
       const lines = chartSeries.map((series) => `<g><polyline points="${series.values.map((value, index) => `${x(index)},${y(value)}`).join(' ')}" fill="none" stroke="${series.color}" stroke-width="4" vector-effect="non-scaling-stroke" />${series.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="6" fill="#fff" stroke="${series.color}" stroke-width="3" vector-effect="non-scaling-stroke" />`).join('')}</g>`).join('');
       chart.innerHTML = `<div class="chart-legend">${chartSeries.map((series) => `<span><i style="background:${series.color}"></i>${series.name}</span>`).join('')}</div><div class="chart-body"><div class="chart-y-label">准确率</div><div class="chart-y-ticks">${[1,.9,.8,.7,.6,.5,.4].map((tick) => `<span>${tick.toFixed(1)}</span>`).join('')}</div><div class="chart-plot"><svg viewBox="0 0 ${chartWidth} ${chartHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="五个数据集上，随着上下文比例增加而变化的准确率曲线">${grid}${vertical}${lines}</svg></div></div><div class="chart-axis"><span aria-hidden="true"></span><span aria-hidden="true"></span><div class="chart-axis-content"><div class="chart-x-ticks">${fractions.map((fraction) => `<span>${fraction}</span>`).join('')}</div><div class="chart-x-label">上下文比例 (%)</div></div></div><figcaption>曲线根据论文第 6 图目测近似重建；未展示原图中的波动带。<a href="../figure-6.png" target="_blank" rel="noreferrer">查看论文原图</a></figcaption>`;
-
-      const ablationRows = [['GAMMA',65,80.67,70,83.33],['TCGA-KIRC',69.70,69.83,72.73,71.49],['Enrico',49.66,80.75,50.68,83.51],['MET-Meme(E)',35.55,64.16,38.39,66.02],['RAVDESS',55.21,88.25,60,92.51],['WESAD',79.34,90.90,83.35,93.35],['TCGA-LUAD',54.10,58.11,60.66,45.16],['PAD-UFES-20',76.29,93.16,76.85,93.04]];
-      $('#ablation-table').innerHTML = `<table aria-label="TabPFN 与 Fusion Anything 的消融结果"><thead><tr><th rowspan="2">数据集</th><th colspan="2">TabPFN</th><th colspan="2">Fusion Anything</th></tr><tr><th>ACC ↑</th><th>AUC ↑</th><th>ACC ↑</th><th>AUC ↑</th></tr></thead><tbody>${ablationRows.map((row) => { const aucDelta = row[4] - row[2]; return `<tr><th>${row[0]}</th><td>${row[1].toFixed(2)}</td><td>${row[2].toFixed(2)}</td><td class="best">${row[3].toFixed(2)}</td><td class="${aucDelta >= 0 ? 'best' : ''}">${row[4].toFixed(2)}${aucDelta < 0 ? `<span class="negative">　−${Math.abs(aucDelta).toFixed(2)}</span>` : ''}</td></tr>`; }).join('')}</tbody></table>`;
 
       const encoderRows = [
         ['Derm7pt','图像 + 表格','ResNet18 + TabPFN',61.10,53.92,62.87,63.80,56.29,59.60,72.41], ['Derm7pt','图像 + 表格','DINOv3 + TabPFN',66.50,54.43,58.73,64.56,60.42,60.93,74.68], ['MultiOFF','图像 + 文本','DINOv3 + Qwen3',56.82,59.06,60.18,58.17,62.19,59.28,63.76], ['MultiOFF','图像 + 文本','ResNet18 + Qwen3',56.38,61.74,64.21,56.15,62.64,60.22,63.76], ['MultiOFF','图像 + 文本','DINOv3 + SigLIP2',55.03,58.39,61.07,58.61,54.59,57.54,61.74], ['NYUDv2','RGB + 深度','ResNet18 + ResNet18',56.17,40.06,45.06,53.41,53.16,49.57,59.33], ['NYUDv2','RGB + 深度','DINOv3 + ResNet18',73.04,41.79,64.93,70.74,71.61,64.42,75.54], ['NYUDv2','RGB + 深度','ResNet18 + DINOv3',60.60,31.09,52.04,58.51,58.10,52.07,62.23], ['RAVDESS','音频 + 视觉','WavLM + DINOv3',55,23.54,63.75,57.64,51.74,50.33,60], ['RAVDESS','音频 + 视觉','Whisper + DINOv3',76.53,35.42,66.04,67.22,67.71,62.58,74.17], ['RAVDESS','音频 + 视觉','WavLM + ResNet18',31.04,19.17,51.39,35,32.99,33.92,48.54]
