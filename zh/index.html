@@ -151,9 +151,11 @@
     .slide--attention { --accent: #3f7fb3; }
     .slide--in-context { --accent: var(--violet); }
     .slide--experiments { --accent: var(--teal); }
-    .slide--experiments .data-table-wrap { margin-top: 0; }
+    .slide--experiments .data-table-wrap { max-height: calc(100svh - 325px); margin-top: 0; overflow-y: auto; overscroll-behavior: contain; }
+    .slide--experiments .data-table-wrap thead { position: sticky; top: 0; z-index: 1; }
     .slide--experiments th, .slide--experiments td { padding: 9px 12px; }
     .slide--experiments th:not(:first-child), .slide--experiments td { text-align: center; }
+    .slide--experiments .result-table-note { margin: 12px 0 0; color: var(--dim); font-size: 16px; line-height: 1.5; }
     .slide--benchmark { --accent: var(--orange); }
     .slide--context { --accent: var(--orange); }
     .slide--datasets { --accent: var(--teal); }
@@ -336,28 +338,34 @@
     <section id="experiments" class="slide slide--experiments" data-index="6">
       <div class="slide-inner">
         <div class="heading"><h2>与专用模型<br><em>竞争。</em></h2></div>
-        <div class="data-table-wrap" data-scrollable="true" tabindex="0"><table aria-label="12 组数据集准确率对比"><thead><tr><th>数据集</th><th>Fusion Anything ACC (%)</th><th>专用方法均值 ACC (%)</th><th>差值（百分点）</th></tr></thead><tbody>
-          <tr><th>GAMMA</th><td class="best">70.00</td><td>62.33</td><td class="best">+7.67</td></tr>
-          <tr><th>NYUDv2</th><td class="best">59.33</td><td>49.57</td><td class="best">+9.76</td></tr>
-          <tr><th>MultiOFF</th><td class="best">63.76</td><td>59.28</td><td class="best">+4.48</td></tr>
-          <tr><th>MET-Meme(E)</th><td class="best">38.39</td><td>33.08</td><td class="best">+5.31</td></tr>
-          <tr><th>Handwritten</th><td class="best">98.75</td><td>83.48</td><td class="best">+15.27</td></tr>
-          <tr><th>WESAD</th><td class="best">83.35</td><td>63.19</td><td class="best">+20.16</td></tr>
-          <tr><th>MELD</th><td class="best">64.29</td><td>57.66</td><td class="best">+6.63</td></tr>
-          <tr><th>MUStARD</th><td>70.29</td><td>70.97</td><td class="negative">−0.68</td></tr>
-          <tr><th>TCGA-KIRC</th><td class="best">72.73</td><td>68.08</td><td class="best">+4.65</td></tr>
-          <tr><th>TCGA-LUAD</th><td class="best">60.66</td><td>55.96</td><td class="best">+4.70</td></tr>
-          <tr><th>PAD-UFES-20</th><td class="best">76.85</td><td>72.55</td><td class="best">+4.30</td></tr>
-          <tr><th>N-MNIST+N-TIDIGITS</th><td class="best">94.28</td><td>87.18</td><td class="best">+7.10</td></tr>
-        </tbody></table></div>
+        <div class="data-table-wrap" data-scrollable="true" tabindex="0"><table aria-label="18 组数据集准确率对比"><thead><tr><th>数据集</th><th>Fusion Anything ACC (%)</th><th>专用方法均值 ACC (%)</th><th>差值（百分点）</th></tr></thead><tbody>
+          <tr><th>MultiOFF</th><td class="best">65.77</td><td>60.40</td><td class="best">+5.37</td></tr>
+          <tr><th>Twitter1517</th><td class="best">76.47</td><td>76.01</td><td class="best">+0.46</td></tr>
+          <tr><th>CMU-MOSI</th><td class="best">72.30</td><td>62.25</td><td class="best">+10.05</td></tr>
+          <tr><th>UR-FUNNY</th><td class="best">61.97</td><td>60.72</td><td class="best">+1.25</td></tr>
+          <tr><th>MUStARD</th><td class="best">72.46</td><td>69.85</td><td class="best">+2.61</td></tr>
+          <tr><th>MET-Meme(E)</th><td class="best">37.91</td><td>29.70</td><td class="best">+8.21</td></tr>
+          <tr><th>RAVDESS</th><td class="best">70.00</td><td>51.49</td><td class="best">+18.51</td></tr>
+          <tr><th>Memotion</th><td class="best">78.18</td><td>78.00</td><td class="best">+0.18</td></tr>
+          <tr><th>NYUDv2</th><td class="best">62.84</td><td>47.36</td><td class="best">+15.48</td></tr>
+          <tr><th>Enrico</th><td class="best">52.74</td><td>45.71</td><td class="best">+7.03</td></tr>
+          <tr><th>GAMMA</th><td class="best">85.00</td><td>61.20</td><td class="best">+23.80</td></tr>
+          <tr><th>TCGA-KIRC</th><td class="best">75.76</td><td>69.50</td><td class="best">+6.26</td></tr>
+          <tr><th>ROSMAP</th><td class="best">76.42</td><td>68.81</td><td class="best">+7.61</td></tr>
+          <tr><th>TCGA-SKCM</th><td class="best">59.18</td><td>54.69</td><td class="best">+4.49</td></tr>
+          <tr><th>PAD-UFES-20</th><td class="best">76.11</td><td>71.76</td><td class="best">+4.35</td></tr>
+          <tr><th>SIIM-ISIC</th><td class="best">97.83</td><td>97.80</td><td class="best">+0.03</td></tr>
+          <tr><th>Trento</th><td class="best">97.75</td><td>97.07</td><td class="best">+0.68</td></tr>
+          <tr><th>ForestNet</th><td class="best">69.91</td><td>54.66</td><td class="best">+15.25</td></tr>
+        </tbody></table><p class="result-table-note">更新版 Table 3 的 ACC 数据。专用方法均值是五种监督式融合基线的平均值；差值单位为百分点。</p></div>
       </div>
     </section>
 
     <section id="benchmark" class="slide slide--benchmark" data-index="7">
       <div class="slide-inner">
-        <div class="heading"><h2>在不同数据世界中<br><em>保持稳定。</em></h2><p class="subtitle">当模态、领域和预测任务发生变化时，Fusion Anything 仍然接近排名顶部。</p></div>
-        <div class="summary-row"><div><strong>11</strong><span>个第一名</span></div><div><strong>15 / 18</strong><span>次进入前二</span></div></div>
-        <figure class="figure"><img src="../figure-4.png" alt="论文第 4 图：18 个多模态数据集上六种方法的完整排名矩阵"><figcaption class="figure-caption">18 个数据集上的性能排名；颜色更深表示排名更高。</figcaption></figure>
+        <div class="heading"><h2>在不同数据世界中<br><em>保持稳定。</em></h2><p class="subtitle">更新后的排名矩阵在 18 个主要数据集上记录了 16 个第一名和 17 次进入前二。</p></div>
+        <div class="summary-row"><div><strong>16</strong><span>个第一名</span></div><div><strong>17 / 18</strong><span>次进入前二</span></div></div>
+        <figure class="figure"><img src="../figure-4.png" alt="更新后的 Figure 4 排名矩阵，覆盖 Social Media Analysis、Affective Computing、Visual Understanding、Medical 和 Remote Sensing 数据集"><figcaption class="figure-caption">18 个主要数据集上的性能排名；颜色更深表示排名更高。</figcaption></figure>
       </div>
     </section>
 
@@ -477,11 +485,11 @@
       chart.innerHTML = `<div class="chart-legend">${chartSeries.map((series) => `<span><i style="background:${series.color}"></i>${series.name}</span>`).join('')}</div><div class="chart-body"><div class="chart-y-label">准确率</div><div class="chart-y-ticks">${yTicks.map((tick) => `<span>${tick.toFixed(1)}</span>`).join('')}</div><div class="chart-plot"><svg viewBox="0 0 ${chartWidth} ${chartHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="六个数据集在十档上下文比例下、基于三个 sampling seeds 的平均准确率曲线；半透明区域表示 sample SD">${grid}${vertical}${bands}${lines}</svg></div></div><div class="chart-axis"><span aria-hidden="true"></span><span aria-hidden="true"></span><div class="chart-axis-content"><div class="chart-x-ticks">${fractions.map((fraction) => `<span>${fraction}</span>`).join('')}</div><div class="chart-x-label">上下文比例 (%)</div></div></div><figcaption>曲线为 3 个 sampling seeds（1、2、3）的平均准确率；半透明区域表示 sample SD。</figcaption>`;
 
       const encoderRows = [
-        ['Derm7pt','图像 + 表格','ResNet18 + TabPFN',61.10,53.92,62.87,63.80,56.29,59.60,72.41], ['Derm7pt','图像 + 表格','DINOv3 + TabPFN',66.50,54.43,58.73,64.56,60.42,60.93,74.68], ['MultiOFF','图像 + 文本','DINOv3 + Qwen3',56.82,59.06,60.18,58.17,62.19,59.28,63.76], ['MultiOFF','图像 + 文本','ResNet18 + Qwen3',56.38,61.74,64.21,56.15,62.64,60.22,63.76], ['MultiOFF','图像 + 文本','DINOv3 + SigLIP2',55.03,58.39,61.07,58.61,54.59,57.54,61.74], ['NYUDv2','RGB + 深度','ResNet18 + ResNet18',56.17,40.06,45.06,53.41,53.16,49.57,59.33], ['NYUDv2','RGB + 深度','DINOv3 + ResNet18',73.04,41.79,64.93,70.74,71.61,64.42,75.54], ['NYUDv2','RGB + 深度','ResNet18 + DINOv3',60.60,31.09,52.04,58.51,58.10,52.07,62.23], ['RAVDESS','音频 + 视觉','WavLM + DINOv3',55,23.54,63.75,57.64,51.74,50.33,60], ['RAVDESS','音频 + 视觉','Whisper + DINOv3',76.53,35.42,66.04,67.22,67.71,62.58,74.17], ['RAVDESS','音频 + 视觉','WavLM + ResNet18',31.04,19.17,51.39,35,32.99,33.92,48.54]
+        ['MultiOFF','图像 + 文本','DINOv3 + Qwen3',58.39,59.96,61.30,61.30,61.07,60.40,65.77], ['MultiOFF','图像 + 文本','ResNet18 + Qwen3',58.61,57.27,59.96,59.06,57.49,58.48,63.09], ['MultiOFF','图像 + 文本','DINOv3 + BERT',62.42,60.40,56.82,59.73,65.10,60.89,66.44], ['RAVDESS','音频 + 视觉','WavLM + DINOv3',56.74,26.60,60.83,56.39,56.87,51.49,70.00], ['RAVDESS','音频 + 视觉','Whisper + DINOv3',77.71,32.08,68.82,66.94,77.99,64.71,76.04], ['RAVDESS','音频 + 视觉','WavLM + ResNet18',37.92,18.68,47.08,37.64,35.90,35.44,58.54], ['Twitter2015','图像 + 文本','ResNet18 + BERT',64.77,63.20,66.47,67.12,64.51,65.21,67.98], ['Twitter2015','图像 + 文本','DINOv3 + BERT',64.93,62.84,65.57,64.87,64.13,64.47,67.31], ['Twitter2015','图像 + 文本','ResNet18 + Qwen3',60.88,58.66,64.90,67.05,63.36,62.97,65.86]
       ];
       const header = ['数据集','模态','编码器组合','Concat','EFT','MTO','CAF','TMC','均值','本文方法'];
       const encoderBody = encoderRows.map((row, index) => { const first = index === 0 || encoderRows[index - 1][0] !== row[0]; const count = encoderRows.filter((candidate) => candidate[0] === row[0]).length; const bestBaseline = Math.max(...row.slice(3,8)); const oursBest = row[9] >= bestBaseline; return `<tr>${first ? `<th rowspan="${count}" class="group">${row[0]}</th><td rowspan="${count}" class="group">${row[1]}</td>` : ''}<td class="left">${row[2]}</td>${row.slice(3,8).map((value) => `<td>${value.toFixed(2)}</td>`).join('')}<td>${row[8].toFixed(2)}</td><td class="ours ${oursBest ? 'best' : 'not-best'}" aria-label="${row[9].toFixed(2)}，${oursBest ? '本行最佳' : '低于某个单独基线'}">${row[9].toFixed(2)}</td></tr>`; }).join('');
-      $('#encoder-table').innerHTML = `<table aria-label="不同预训练编码器配置下的比较"><colgroup><col style="width:10%"><col style="width:13%"><col style="width:20%"><col span="5" style="width:7.5%"><col style="width:9%"><col style="width:10.5%"></colgroup><thead><tr>${header.map((item, index) => `<th class="${index === 2 ? 'left' : ''}">${item}</th>`).join('')}</tr></thead><tbody>${encoderBody}</tbody></table>`;
+      $('#encoder-table').innerHTML = `<table aria-label="不同预训练编码器配置下的比较"><colgroup><col style="width:10%"><col style="width:13%"><col style="width:20%"><col span="5" style="width:7.5%"><col style="width:9%"><col style="width:10.5%"></colgroup><thead><tr>${header.map((item, index) => `<th class="${index === 2 ? 'left' : ''}">${item}</th>`).join('')}</tr></thead><tbody>${encoderBody}</tbody></table><p class="encoder-caption">准确率（%）：三个数据集、九种预训练编码器配置。论文报告相对专用方法均值的平均优势为 8.55 个百分点。</p>`;
 
       $('#copy-bib').addEventListener('click', async () => {
         const button = $('#copy-bib');
